@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
@@ -23,11 +24,10 @@ public class FilmController {
     }
 
     @PostMapping(value = "/films")
-    public Film create(@RequestBody Film film) throws ValidationException {
+    public Film create(@Valid @RequestBody Film film) throws ValidationException {
         log.debug("Получен запрос POST /films");
-        if(film.getName().isBlank() || film.getDescription().length() > 200 || film.getId() < 0 ||
-                film.getReleaseDate().isBefore(LocalDate.of(1895,12,28)) || film.getDuration() <= 0) {
-            throw new ValidationException("Введенные данные не соответствуют требуемым критериям");
+        if(film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
+            throw new ValidationException("Указываемая дата релиза не должна быть ранее 28.12.1895 года");
         }
         film.setId(idFilmCounter++);
         films.put(film.getId(), film);
@@ -35,10 +35,10 @@ public class FilmController {
     }
 
     @PutMapping(value = "/films")
-    public Film update(@RequestBody Film film) throws IOException {
+    public Film update(@Valid @RequestBody Film film) throws IOException {
         log.debug("Получен запрос PUT /films");
         if (!films.containsKey(film.getId())) {
-            throw new IOException("Введенные данные не соответствуют требуемым критериям");
+            throw new IOException("Введен некорректный номер id = " + film.getId());
         }
         films.put(film.getId(), film);
         return film;

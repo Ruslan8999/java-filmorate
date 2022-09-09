@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
@@ -23,12 +24,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/users")
-    public User create(@RequestBody User user) throws ValidationException {
+    public User create(@Valid @RequestBody User user) {
         log.debug("Получен запрос POST /users");
-        if(!user.getEmail().contains("@") || user.getEmail().isBlank() ||
-                user.getLogin().isBlank() || user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Введенные данные не соответствуют требуемым критериям");
-        }
         if(user.getName() == null){
             user.setName(user.getLogin());
         }
@@ -38,10 +35,10 @@ public class UserController {
     }
 
     @PutMapping(value = "/users")
-    public User update(@RequestBody User user) throws IOException {
+    public User update(@Valid @RequestBody User user) throws IOException {
         log.debug("Получен запрос PUT /users");
-        if (user.getEmail().isBlank() || user.getEmail() == null || user.getId() < 0) {
-            throw new IOException("Введенные данные не соответствуют требуемым критериям");
+        if (!users.containsKey(user.getId())) {
+            throw new IOException("Введен некорректный id = " + user.getId());
         }
         users.put(user.getId(), user);
         return user;

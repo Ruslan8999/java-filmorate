@@ -23,40 +23,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class FilmorateApplicationTests {
-	private static final LocalDate DATE_RELEASE = LocalDate.of(1895,12,28);
+    private static final LocalDate DATE_RELEASE = LocalDate.of(1895, 12, 28);
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private FilmController filmController;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-	@Autowired
-	private MockMvc mockMvc;
+    @AfterEach
+    public void afterEach() {
+        filmController.getFilms().clear();
+    }
 
-	@Autowired
-	private FilmController filmController;
+    @Test
+    void tryToCreateFilmWithEarlyDateBadRequest() throws Exception {
+        Film film = new Film("name", RandomString.make(200), DATE_RELEASE.minusDays(1), 1);
+        String body = objectMapper.writeValueAsString(film);
+        this.mockMvc.perform(post("/films").content(body).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ValidationException))
+                .andExpect(result -> assertEquals("Указываемая дата релиза не должна быть ранее 28.12.1895 года", result.getResolvedException().getMessage()));
+    }
 
-	@Autowired
-	private ObjectMapper objectMapper;
-
-
-	@AfterEach
-	public void afterEach(){
-		filmController.getFilms().clear();
-	}
-
-	@Test
-	void tryToCreateFilmWithEarlyDateBadRequest() throws Exception {
-		Film film = new Film("name", RandomString.make(200), DATE_RELEASE.minusDays(1), 1);
-		String body = objectMapper.writeValueAsString(film);
-		this.mockMvc.perform(post("/films").content(body).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isBadRequest())
-				.andExpect(result -> assertTrue(result.getResolvedException() instanceof ValidationException))
-				.andExpect(result -> assertEquals("Введенные данные не соответствуют требуемым критериям", result.getResolvedException().getMessage()));
-	}
-
-	@Test
-	void tryToCreateFilmWithoutNameBadRequest() throws Exception {
-		Film film = new Film(" ", RandomString.make(200), DATE_RELEASE, 1);
-		String body = objectMapper.writeValueAsString(film);
-		this.mockMvc.perform(post("/films").content(body).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isBadRequest())
-				.andExpect(result -> assertTrue(result.getResolvedException() instanceof ValidationException))
-				.andExpect(result -> assertEquals("Введенные данные не соответствуют требуемым критериям", result.getResolvedException().getMessage()));
-	}
+    @Test
+    void tryToCreateFilmWithoutNameBadRequest() throws Exception {
+        Film film = new Film(" ", RandomString.make(200), DATE_RELEASE, 1);
+        String body = objectMapper.writeValueAsString(film);
+        this.mockMvc.perform(post("/films").content(body).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }
