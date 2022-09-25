@@ -1,46 +1,75 @@
 package ru.yandex.practicum.filmorate.controllers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.UnableToFindException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.Optional;
 
+@Slf4j
 @RestController
+@RequestMapping("/users")
 public class UserController {
-    private int idUserCounter = 1;
-    private final static Logger log = LoggerFactory.getLogger(UserController.class);
-    private final Map<Integer, User> users = new HashMap();
+    UserStorage userStorage;
+    UserService userService;
 
-    @GetMapping("/users")
-    public Collection<User> findAll() {
-        log.debug("Текущее количество пользователей: {}", users.size());
-        return users.values();
+    @Autowired
+    public UserController(UserStorage userStorage, UserService userService) {
+        this.userStorage = userStorage;
+        this.userService = userService;
     }
 
-    @PostMapping(value = "/users")
+    @GetMapping
+    public Collection<User> findAll() {
+        log.debug("Получен запрос GET /users");
+        return userStorage.findAll();
+    }
+
+    @GetMapping("{id}")
+    public Optional<User> findById(@PathVariable int id){
+        return userStorage.findById(id);
+    }
+
+    @GetMapping("{id}/friends")
+    public Collection<User> getFriends(@PathVariable int id) {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("{id}/friends/common/{otherId}")
+    public Collection<User> getCrossFriend(@PathVariable int id, @PathVariable int otherId){
+        return userService.getUserCrossFriends(id, otherId);
+    }
+
+
+    @PostMapping
     public User create(@Valid @RequestBody User user) {
         log.debug("Получен запрос POST /users");
-        if(user.getName() == null){
-            user.setName(user.getLogin());
-        }
-        user.setId(idUserCounter++);
-        users.put(user.getId(), user);
-        return user;
+        return userStorage.create(user);
     }
 
-    @PutMapping(value = "/users")
+    @PutMapping
     public User update(@Valid @RequestBody User user) throws IOException {
         log.debug("Получен запрос PUT /users");
-        if (!users.containsKey(user.getId())) {
-            throw new IOException("Введен некорректный id = " + user.getId());
+        return userStorage.update(user);
+    }
+
+    @PutMapping("{id}/friends/{friendId}")
+    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
+        if (id < 1 || friendId < 1) {
+            throw new UnableToFindException();
         }
-        users.put(user.getId(), user);
-        return user;
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.removeFriend(id, friendId);
     }
 }

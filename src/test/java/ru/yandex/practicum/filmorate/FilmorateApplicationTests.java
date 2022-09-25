@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
@@ -26,8 +27,8 @@ class FilmorateApplicationTests {
     private static final LocalDate DATE_RELEASE = LocalDate.of(1895, 12, 28);
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private FilmController filmController;
+
+    private InMemoryFilmStorage filmController;
     @Autowired
     private ObjectMapper objectMapper;
 
