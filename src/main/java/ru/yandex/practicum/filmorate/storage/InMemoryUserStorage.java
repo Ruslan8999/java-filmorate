@@ -46,7 +46,7 @@ public class InMemoryUserStorage implements UserStorage{
         return user;
     }
     @Override
-    public List<Optional<User>> getUserFriends(int id){
+    public Collection<Optional<User>> getUserFriends(int id){
         Optional<User> user = findById(id);
         List<Optional<User>> result = new ArrayList<>();
         for (Integer idFriend: user.get().getFriends())
@@ -55,7 +55,7 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     @Override
-    public ArrayList<User> getUserCrossFriends(int id, int otherId) {
+    public Collection<User> getUserCrossFriends(int id, int otherId) {
         User user = users.get(id);
         User friend = users.get(otherId);
         return user.getCommonFriendList(friend).stream()

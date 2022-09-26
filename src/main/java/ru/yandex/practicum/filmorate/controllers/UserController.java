@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -10,23 +11,18 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    UserStorage userStorage;
-    UserService userService;
-
     @Autowired
-    public UserController(UserStorage userStorage, UserService userService) {
-        this.userStorage = userStorage;
-        this.userService = userService;
-    }
+    private UserStorage userStorage;
+    @Autowired
+    private UserService userService;
 
     @GetMapping
     public Collection<User> findAll() {
@@ -35,17 +31,17 @@ public class UserController {
     }
 
     @GetMapping("{id}")
-    public Optional<User> findById(@PathVariable int id){
+    Optional<User> findById(@PathVariable int id){
         return userStorage.findById(id);
     }
 
     @GetMapping("{id}/friends")
-    public List<Optional<User>> getFriends(@PathVariable int id) {
+    public Collection<Optional<User>> getFriends(@PathVariable int id) {
         return userService.getFriends(id);
     }
 
     @GetMapping("{id}/friends/common/{otherId}")
-    public ArrayList<User> getCrossFriend(@PathVariable int id, @PathVariable int otherId){
+    public Collection<User> getCrossFriend(@PathVariable int id, @PathVariable int otherId){
         return userService.getUserCrossFriends(id, otherId);
     }
 

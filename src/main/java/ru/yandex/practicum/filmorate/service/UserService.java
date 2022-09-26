@@ -1,32 +1,29 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    UserStorage userStorage;
-
     @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
+    private UserStorage userStorage;
 
-    public Optional<User> findById(int id) {
+     Optional<User> findById(int id) {
         return userStorage.findById(id);
     }
 
-    public List<Optional<User>> getFriends(int id) {
+    public Collection<Optional<User>> getFriends(int id) {
         return userStorage.getUserFriends(id);
     }
 
-    public ArrayList<User> getUserCrossFriends(int id, int otherId){
+    public Collection<User> getUserCrossFriends(int id, int otherId){
         return userStorage.getUserCrossFriends(id, otherId);
     }
 

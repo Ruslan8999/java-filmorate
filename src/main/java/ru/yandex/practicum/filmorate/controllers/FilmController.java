@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,19 +15,13 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
-    FilmStorage filmStorage;
-    FilmService service;
     @Autowired
-    public FilmController(FilmStorage filmStorage, FilmService service) {
-        this.filmStorage = filmStorage;
-        this.service = service;
-    }
-
-    public FilmController(FilmService service) {
-        this.service = service;
-    }
+    private FilmStorage filmStorage;
+    @Autowired
+    private FilmService service;
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -35,7 +30,7 @@ public class FilmController {
     }
 
     @GetMapping("{id}")
-    public Optional<Film> findById(@PathVariable int id){
+    Optional<Film> findById(@PathVariable int id){
         return service.findById(id);
     }
 
@@ -51,7 +46,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film update(@Valid @RequestBody Film film) throws IOException {
+    public Film update(@Valid @RequestBody Film film) {
         log.debug("Получен запрос PUT /films");
         return filmStorage.updateFilm(film);
     }
