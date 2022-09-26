@@ -10,7 +10,9 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -38,12 +40,12 @@ public class UserController {
     }
 
     @GetMapping("{id}/friends")
-    public Collection<User> getFriends(@PathVariable int id) {
+    public List<Optional<User>> getFriends(@PathVariable int id) {
         return userService.getFriends(id);
     }
 
     @GetMapping("{id}/friends/common/{otherId}")
-    public Collection<User> getCrossFriend(@PathVariable int id, @PathVariable int otherId){
+    public ArrayList<User> getCrossFriend(@PathVariable int id, @PathVariable int otherId){
         return userService.getUserCrossFriends(id, otherId);
     }
 

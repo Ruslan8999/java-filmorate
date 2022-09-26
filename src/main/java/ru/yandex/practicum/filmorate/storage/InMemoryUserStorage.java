@@ -1,15 +1,10 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -50,16 +45,20 @@ public class InMemoryUserStorage implements UserStorage{
         users.put(user.getId(), user);
         return user;
     }
-
-    public Collection<User> getUserFriends(int id){
-        return users.get(id).getFriends();
+    @Override
+    public List<Optional<User>> getUserFriends(int id){
+        Optional<User> user = findById(id);
+        List<Optional<User>> result = new ArrayList<>();
+        for (Integer idFriend: user.get().getFriends())
+            result.add(findById(idFriend));
+        return result;
     }
 
     @Override
-    public Collection<User> getUserCrossFriends(int id, int otherId) {
-        int userId = findById(id).get().getId();
-        return findById(id).get().getFriends().stream()
-                .filter(friend -> friend.getFriends().stream().map(user -> user.getId()).equals(userId))
-                .collect(Collectors.toSet());
+    public ArrayList<User> getUserCrossFriends(int id, int otherId) {
+        User user = users.get(id);
+        User friend = users.get(otherId);
+        return user.getCommonFriendList(friend).stream()
+                .map(ids -> users.get(ids)).collect(Collectors.toCollection(ArrayList::new));
     }
 }
