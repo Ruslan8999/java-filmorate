@@ -9,9 +9,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
@@ -27,7 +27,7 @@ class FilmorateApplicationTests {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private FilmController filmController;
+    private InMemoryFilmStorage filmController;
     @Autowired
     private ObjectMapper objectMapper;
 
