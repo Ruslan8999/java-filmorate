@@ -7,10 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.UnableToFindException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -19,24 +17,26 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    @Autowired
-    private UserStorage userStorage;
+
     @Autowired
     private UserService userService;
 
     @GetMapping
     public Collection<User> findAll() {
         log.debug("Получен запрос GET /users");
-        return userStorage.findAll();
+        return userService.findAll();
     }
 
     @GetMapping("{id}")
-    Optional<User> findById(@PathVariable int id){
-        return userStorage.findById(id);
+    public Optional<User> findById(@PathVariable int id){
+        if (userService.findById(id).isEmpty()) {
+            throw new UnableToFindException();
+        }
+        return userService.findById(id);
     }
 
     @GetMapping("{id}/friends")
-    public Collection<Optional<User>> getFriends(@PathVariable int id) {
+    public Collection<User> getFriends(@PathVariable int id) {
         return userService.getFriends(id);
     }
 
@@ -47,15 +47,15 @@ public class UserController {
 
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
+    public Optional<User> createUser(@Valid @RequestBody User user) {
         log.debug("Получен запрос POST /users");
-        return userStorage.create(user);
+        return userService.createUser(user);
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User user) throws IOException {
+    public User updateUser(@Valid @RequestBody User user) {
         log.debug("Получен запрос PUT /users");
-        return userStorage.update(user);
+        return userService.updateUser(user);
     }
 
     @PutMapping("{id}/friends/{friendId}")

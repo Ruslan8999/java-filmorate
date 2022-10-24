@@ -11,7 +11,7 @@ public interface UserStorage {
     Optional<User> findById(int id);
     User create(User user);
     User update(User user);
-    public Collection<Optional<User>> getUserFriends(int id);
+    Collection<User> getUserFriends(int id);
     Collection<User> getUserCrossFriends(int id, int otherId);
-
+    void deleteUser(int id);
 }

@@ -2,10 +2,10 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,17 +29,42 @@ public class InMemoryFilmStorage implements FilmStorage{
     }
 
     @Override
-    public List<Film> getMostPopular(Integer count){
-        return films.values().stream()
-                .sorted(Comparator.comparingInt(f -> -f.getLikes().size()))
+    public List<Film> getMostPopular(Integer count, Integer genreId, Integer date) {
+
+        if (genreId == null && date != null) {
+            return films.values().stream()
+                    .filter(f -> f.getReleaseDate().getYear() == date)
+                    .sorted(Comparator.comparingInt(f -> -f.getLikes().size()))
+                    .limit(count).collect(Collectors.toList());
+        }
+
+        if (genreId != null && date == null) {
+            return films.values().stream()
+                    .filter(f -> f.getGenres().stream()
+                            .map(Genre::getId)
+                            .collect(Collectors.toList())
+                            .contains(genreId))
+                    .sorted(Comparator.comparingInt(f -> -f.getLikes().size()))
+                    .limit(count).collect(Collectors.toList());
+        }
+
+        if (genreId != null && date != null) {
+            return films.values().stream()
+                    .filter(f -> f.getGenres().stream()
+                            .map(Genre::getId)
+                            .collect(Collectors.toList())
+                            .contains(genreId))
+                    .filter(f -> f.getReleaseDate().getYear() == date)
+                    .sorted(Comparator.comparingInt(f -> -f.getLikes().size()))
+                    .limit(count).collect(Collectors.toList());
+        }
+
+        return films.values().stream().sorted(Comparator.comparingInt(f -> -f.getLikes().size()))
                 .limit(count).collect(Collectors.toList());
     }
 
     @Override
     public Film create(Film film) {
-        if(film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
-            throw new ValidationException("Указываемая дата релиза не должна быть ранее 28.12.1895 года");
-        }
         film.setId(idFilmCounter++);
         films.put(film.getId(), film);
         return film;
@@ -56,5 +81,15 @@ public class InMemoryFilmStorage implements FilmStorage{
 
     public Map<Integer, Film> getFilms() {
         return films;
+    }
+
+    @Override
+    public Collection<Film> getCommonFilms(int userId, int friendId) {
+        throw new InternalServerException("Метод не используется в данной реализации");
+    }
+
+    @Override
+    public void deleteFilm(int filmId) {
+        throw new UnsupportedOperationException("Метод не используется в данной реализации");
     }
 }

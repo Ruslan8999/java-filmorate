@@ -11,5 +11,7 @@ public interface FilmStorage {
     Optional<Film> findById(int id);
     Film create(Film film);
     Film updateFilm(Film film);
-    List<Film> getMostPopular(Integer count);
+    List<Film> getMostPopular(Integer count, Integer genreId, Integer date);
+    Collection<Film> getCommonFilms(int userId, int friendId);
+    void deleteFilm(int filmId);
 }
