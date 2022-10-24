@@ -37,16 +37,6 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void tryToCreateFilmWithEarlyDateBadRequest() throws Exception {
-        Film film = new Film("name", RandomString.make(200), DATE_RELEASE.minusDays(1), 1);
-        String body = objectMapper.writeValueAsString(film);
-        this.mockMvc.perform(post("/films").content(body).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ValidationException))
-                .andExpect(result -> assertEquals("Указываемая дата релиза не должна быть ранее 28.12.1895 года", result.getResolvedException().getMessage()));
-    }
-
-    @Test
     void tryToCreateFilmWithoutNameBadRequest() throws Exception {
         Film film = new Film(" ", RandomString.make(200), DATE_RELEASE, 1);
         String body = objectMapper.writeValueAsString(film);
