@@ -7,10 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.UnableToFindException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -19,43 +17,48 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    @Autowired
-    private UserStorage userStorage;
+
     @Autowired
     private UserService userService;
 
     @GetMapping
     public Collection<User> findAll() {
-        log.debug("Получен запрос GET /users");
-        return userStorage.findAll();
+        log.debug("User findAll");
+        return userService.findAll();
     }
 
     @GetMapping("{id}")
-    Optional<User> findById(@PathVariable int id){
-        return userStorage.findById(id);
+    public Optional<User> findById(@PathVariable int id) {
+        if (userService.findById(id).isEmpty()) {
+            throw new UnableToFindException();
+        }
+        log.debug("User findById: " + id);
+        return userService.findById(id);
     }
 
     @GetMapping("{id}/friends")
-    public Collection<Optional<User>> getFriends(@PathVariable int id) {
+    public Collection<User> getFriends(@PathVariable int id) {
+        log.debug("User getFriends: " + id);
         return userService.getFriends(id);
     }
 
     @GetMapping("{id}/friends/common/{otherId}")
-    public Collection<User> getCrossFriend(@PathVariable int id, @PathVariable int otherId){
+    public Collection<User> getCrossFriend(@PathVariable int id, @PathVariable int otherId) {
+        log.debug("User getCrossFriend");
         return userService.getUserCrossFriends(id, otherId);
     }
 
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
-        log.debug("Получен запрос POST /users");
-        return userStorage.create(user);
+    public Optional<User> createUser(@Valid @RequestBody User user) {
+        log.debug("createUser: " + user);
+        return userService.createUser(user);
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User user) throws IOException {
-        log.debug("Получен запрос PUT /users");
-        return userStorage.update(user);
+    public User updateUser(@Valid @RequestBody User user) {
+        log.debug("updateUser: " + user);
+        return userService.updateUser(user);
     }
 
     @PutMapping("{id}/friends/{friendId}")

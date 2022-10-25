@@ -1,18 +1,24 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.*;
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
-
     private int id;
     @Email
     private String email;
@@ -20,20 +26,20 @@ public class User {
     private String login;
     private String name;
     @Past
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDate birthday;
-    private Set<Integer> friends = new HashSet<>();
+    private Set<User> friends = new HashSet<>();
 
-    public void addFriend(int userId){
-        this.friends.add(userId);
+    public User(Integer id, @Valid String email, @Valid String login, String name, LocalDate birthday) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name.isEmpty() || name.isBlank() ? login : name;
+        this.birthday = birthday;
+        this.friends = new HashSet<>();
     }
 
-    public void removeFriend(int userId){
-        this.friends.remove(userId);
-    }
-
-    public List<Integer> getCommonFriendList(User friend) {
-        return friend.getFriends().stream()
-                .filter(friends::contains)
-                .collect(Collectors.toCollection(ArrayList::new));
+    public void addFriend(User user) {
+        this.friends.add(user);
     }
 }

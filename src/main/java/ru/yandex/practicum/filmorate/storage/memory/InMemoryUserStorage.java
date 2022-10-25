@@ -1,14 +1,15 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.memory;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
     private int idUserCounter = 1;
     private final Map<Integer, User> users = new HashMap();
 
@@ -45,20 +46,23 @@ public class InMemoryUserStorage implements UserStorage{
         users.put(user.getId(), user);
         return user;
     }
+
     @Override
-    public Collection<Optional<User>> getUserFriends(int id){
-        Optional<User> user = findById(id);
-        List<Optional<User>> result = new ArrayList<>();
-        for (Integer idFriend: user.get().getFriends())
-            result.add(findById(idFriend));
-        return result;
+    public Collection<User> getUserFriends(int id) {
+        return users.get(id).getFriends();
     }
 
     @Override
     public Collection<User> getUserCrossFriends(int id, int otherId) {
-        User user = users.get(id);
-        User friend = users.get(otherId);
-        return user.getCommonFriendList(friend).stream()
-                .map(ids -> users.get(ids)).collect(Collectors.toCollection(ArrayList::new));
+        int userId = findById(id).get().getId();
+        return findById(id).get().getFriends().stream()
+                .filter(friend -> friend.getFriends().stream().map(user -> user.getId()).equals(userId))
+                .collect(Collectors.toSet());
+
+    }
+
+    @Override
+    public void deleteUser(int id) {
+        throw new UnsupportedOperationException("В данной реализации хранилища метод не поддерживается");
     }
 }
