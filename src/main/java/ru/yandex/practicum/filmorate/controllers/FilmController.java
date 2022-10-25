@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -27,12 +26,13 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
-        log.debug("Получен запрос GET /films");
+        log.debug("findAll");
         return service.findAll();
     }
 
     @GetMapping("{id}")
     Optional<Film> findById(@PathVariable int id){
+        log.debug("findById: " + id);
         return service.findById(id);
     }
 
@@ -40,35 +40,34 @@ public class FilmController {
     public Collection<Film> getPopular(@RequestParam(required = false, defaultValue = "10", name = "count") Integer count,
                                        @RequestParam(required = false, name = "genreId") @Nullable Integer genreId,
                                        @RequestParam(required = false, name = "year") @Nullable Integer date) {
+        log.debug("getPopular");
         return service.getMostPopular(count, genreId, date);
     }
 
     @GetMapping("common")
-    public Collection<Film> getCommonFilms(
-            @RequestParam int userId,
-            @RequestParam int friendId) {
-        log.info("getCommonFilms");
+    public Collection<Film> getCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
+        log.debug("getCommonFilms");
         return service.getCommonFilms(userId, friendId);
     }
 
     @PostMapping
-    public Film create(@Valid @RequestBody Film film) {
-        log.debug("Получен запрос POST /films");
+    public Film createFilm(@Valid @RequestBody Film film) {
         if (film.getMpa() == null) {
             throw new InternalServerException();
         }
+        log.debug("createFilm: " + film);
         service.createFilm(film);
         return film;
     }
 
     @PutMapping
-    public Film update(@Valid @RequestBody Film film) {
-        log.debug("Получен запрос PUT /films");
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        log.debug("updateFilm: " + film);
         return service.updateFilm(film);
     }
 
     @PutMapping("{id}/like/{userId}")
-    public void addLike(@PathVariable int id, @PathVariable int userId) throws IOException {
+    public void addLike(@PathVariable int id, @PathVariable int userId) {
         service.addLike(id, userId);
     }
 
@@ -79,6 +78,7 @@ public class FilmController {
 
     @DeleteMapping("{filmId}")
     public void deleteFilm(@PathVariable int filmId) {
+        log.debug("deleteFilm: " + filmId);
         service.removeFilm(filmId);
     }
 }

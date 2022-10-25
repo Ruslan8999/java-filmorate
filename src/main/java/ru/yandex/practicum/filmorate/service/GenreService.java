@@ -25,10 +25,6 @@ public class GenreService {
         return genreDao.findById(id);
     }
 
-    public void deleteAllByFilmId(Long filmId) {
-        genreDao.deleteAllByFilmId(filmId);
-    }
-
     public Optional<Genre> create(Genre genre) {
         return genreDao.create(genre);
     }

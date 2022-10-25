@@ -28,8 +28,6 @@ public class User {
     @Past
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDate birthday;
-
-    //private Set<Integer> friends = new HashSet<>();
     private Set<User> friends = new HashSet<>();
 
     public User(Integer id, @Valid String email, @Valid String login, String name, LocalDate birthday) {
@@ -43,9 +41,5 @@ public class User {
 
     public void addFriend(User user) {
         this.friends.add(user);
-    }
-
-    public void removeFriend(int userId){
-        this.friends.remove(userId);
     }
 }

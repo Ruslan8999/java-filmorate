@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 public class GenreDaoImpl implements GenreDao {
     private static final String SELECT_ALL = "SELECT * FROM genres";
     private static final String SELECT_BY_ID = "SELECT * FROM genres WHERE genre_id = ?";
-    private static final String DELETE_BY_ID = "DELETE FROM films_genres WHERE genre_id = ?";
     private static final String ADD_GENRE = "INSERT INTO genres (name) values (?)";
     private static final String UPDATE_BY_ID = "UPDATE genres SET name = ? WHERE genre_id = ?";
 
@@ -39,11 +38,6 @@ public class GenreDaoImpl implements GenreDao {
             return Optional.of(new Genre(rs.getInt(1), rs.getString(2)));
         }
         return Optional.empty();
-    }
-
-    @Override
-    public void deleteAllByFilmId(Long filmId) {
-        jdbcTemplate.update(DELETE_BY_ID, filmId);
     }
 
     @Override

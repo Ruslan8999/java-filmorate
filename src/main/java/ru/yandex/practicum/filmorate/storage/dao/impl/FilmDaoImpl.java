@@ -207,7 +207,7 @@ public class FilmDaoImpl implements FilmStorage {
     }
 
     @Override
-    public List<Film> getMostPopular(Integer count, Integer genreId, Integer date) {
+    public Collection<Film> getMostPopular(Integer count, Integer genreId, Integer date) {
         String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE,  F.DURATION, F.MPA_ID, F.NAME AS MPA_NAME " +
                 "FROM FILMS  F LEFT JOIN  LIKES L ON F.FILM_ID  = L.FILM_ID " +
                 "GROUP BY F.FILM_ID, L.USER_ID ORDER BY COUNT(L.USER_ID) DESC LIMIT :count";

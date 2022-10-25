@@ -25,8 +25,8 @@ public class GenreController {
     }
 
     @GetMapping
-    public Collection<Genre> findAll(){
-        log.info("Получен запрос на показ всех жанров");
+    public Collection<Genre> findAll() {
+        log.debug("Genres findAll");
         return service.findAll();
     }
 
@@ -35,6 +35,7 @@ public class GenreController {
         if (id < 1) {
             throw new UnableToFindException();
         }
+        log.debug("Genres getGenre: " + id);
         return service.findById(id);
     }
 }

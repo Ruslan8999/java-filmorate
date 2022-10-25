@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -42,7 +44,6 @@ public class UserService {
             user.setName(user.getLogin());
         }
         userStorage.create(user);
-
         return Optional.of(user);
     }
 
@@ -58,33 +59,15 @@ public class UserService {
         User user = userStorage.findById(id).get();
         user.addFriend(friend);
         userStorage.update(user);
-    }
-
-    public void removeFriend(int id, int userId) {
-        User user = userStorage.findById(id).get();
-        user.setFriends(user.getFriends().stream().filter(user1 -> user1.getId() != userId)
-                .collect(Collectors.toSet()));
-        userStorage.update(user);
-    }
-
-    /*
-    public void addFriend(int id, int friendId) {
-        User friend = userStorage.findById(friendId).get();
-        User user = userStorage.findById(id).get();
-        user.addFriend(friendId);
-        userStorage.update(user);
-        friend.addFriend(id);
-        userStorage.update(friend);
+        log.debug("Пользователь: {} добавил в друзья пользователя: {}", user, friend);
     }
 
     public void removeFriend(int id, int friendId) {
-        User friend = userStorage.findById(friendId).get();
         User user = userStorage.findById(id).get();
-        user.removeFriend(friendId);
+        User friend = userStorage.findById(friendId).get();
+        user.setFriends(user.getFriends().stream().filter(user1 -> user1.getId() != friendId)
+                .collect(Collectors.toSet()));
         userStorage.update(user);
-        friend.removeFriend(id);
-        userStorage.update(friend);
+        log.debug("Пользователь: {} удалил из друзей пользователя: {}", user, friend);
     }
-
-     */
 }

@@ -10,8 +10,6 @@ public interface GenreDao {
 
     Optional<Genre> findById(Integer id);
 
-    void deleteAllByFilmId(Long filmId);
-
     Optional<Genre> create(Genre genre);
 
     Optional<Genre> update(Genre genre);

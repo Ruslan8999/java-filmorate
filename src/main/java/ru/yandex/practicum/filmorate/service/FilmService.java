@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -37,7 +36,6 @@ public class FilmService {
     }
 
     public Film createFilm(Film film){
-        log.info("addFilm: {}", film);
         if(film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
             throw new ValidationException("Указываемая дата релиза не должна быть ранее 28.12.1895 года");
         }
@@ -48,7 +46,7 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public List<Film>getMostPopular(Integer count, Integer genreId, Integer date){
+    public Collection<Film>getMostPopular(Integer count, Integer genreId, Integer date){
         return filmStorage.getMostPopular(count, genreId, date);
     }
 
@@ -57,7 +55,7 @@ public class FilmService {
         User user = userService.findById(userId).get();
         film.addLike(userId);
         filmStorage.updateFilm(film);
-        log.info("Пользователь: {} поставил like фильму: {}", user, film);
+        log.debug("Пользователь: {} поставил like фильму: {}", user, film);
     }
 
     public void removeLike(int filmId, int userId) {
@@ -68,7 +66,7 @@ public class FilmService {
         User user = userService.findById(userId).get();
         film.removeLike(userId);
         filmStorage.updateFilm(film);
-        log.info("Пользователь: {} удалил like фильму: {}", user, film);
+        log.debug("Пользователь: {} удалил like фильму: {}", user, film);
     }
 
     public Collection<Film> getCommonFilms(int userId, int friendId) {
